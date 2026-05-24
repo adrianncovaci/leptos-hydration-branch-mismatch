@@ -2,7 +2,7 @@ use leptos::prelude::*;
 use leptos_meta::{provide_meta_context, MetaTags, Stylesheet, Title};
 use leptos_router::{
     components::{Outlet, ProtectedParentRoute, Route, Router, Routes, A},
-    Lazy, LazyRoute, StaticSegment,
+    lazy_route, Lazy, LazyRoute, StaticSegment,
 };
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
@@ -53,13 +53,6 @@ pub fn App() -> impl IntoView {
                     <A href="/">"Home"</A>
                     <A href="/guarded">"Guarded route"</A>
                 </nav>
-
-                <Transition>
-                    {move || {
-                        let v = auth_signal.get();
-                        view! { <p class="auth-status">{format!("auth_signal = {:?}", v)}</p> }
-                    }}
-                </Transition>
 
                 <Routes fallback=|| view! { <p>"Not found."</p> } transition=true>
                     <Route path=StaticSegment("") view=HomePage/>
@@ -120,17 +113,14 @@ fn GuardedPage() -> impl IntoView {
 
 pub struct LazyGuardedPage;
 
+#[lazy_route]
 impl LazyRoute for LazyGuardedPage {
     fn data() -> Self {
         Self
     }
 
-    fn view(_this: Self) -> impl std::future::Future<Output = AnyView> {
-        async move {
-            #[cfg(feature = "hydrate")]
-            gloo_timers::future::TimeoutFuture::new(0).await;
-            view! { <GuardedPage/> }.into_any()
-        }
+    fn view(_this: Self) -> AnyView {
+        view! { <GuardedPage/> }.into_any()
     }
 }
 

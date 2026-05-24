@@ -21,6 +21,7 @@ tokio = { version = "1", features = [
 wasm-bindgen = { version = "0.2.122", optional = true }
 web-sys = { version = "0.3", features = ["Window"], optional = true }
 gloo-timers = { version = "0.3", features = ["futures"], optional = true }
+send_wrapper = "0.6"
 
 [features]
 hydrate = [
