@@ -28,7 +28,14 @@ pub fn App() -> impl IntoView {
     provide_meta_context();
 
     let auth = Resource::new(|| (), |_| check_auth());
-    let auth_condition = move || auth.get().and_then(|result| result.ok());
+    let auth_condition = move || {
+        let value = auth.get().and_then(|result| result.ok());
+        #[cfg(feature = "ssr")]
+        eprintln!("[trace-ssr] auth_condition -> {:?}", value);
+        #[cfg(not(feature = "ssr"))]
+        leptos::logging::log!("[trace-hydrate] auth_condition -> {:?}", value);
+        value
+    };
 
     view! {
         <Stylesheet id="leptos" href="/pkg/hydrate-branching-mismatch.css"/>
