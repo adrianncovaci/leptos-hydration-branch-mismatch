@@ -28,8 +28,14 @@ pub fn App() -> impl IntoView {
     provide_meta_context();
 
     let auth = Resource::new(|| (), |_| check_auth());
+    let auth_signal: RwSignal<Option<bool>> = RwSignal::new(None);
+    Effect::new(move |_| {
+        if let Some(Ok(value)) = auth.get() {
+            auth_signal.set(Some(value));
+        }
+    });
     let auth_condition = move || {
-        let value = auth.get().and_then(|result| result.ok());
+        let value = auth_signal.get();
         #[cfg(feature = "ssr")]
         eprintln!("[trace-ssr] auth_condition -> {:?}", value);
         #[cfg(not(feature = "ssr"))]
