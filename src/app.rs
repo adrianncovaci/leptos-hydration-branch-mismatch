@@ -54,7 +54,14 @@ pub fn App() -> impl IntoView {
                     <A href="/guarded">"Guarded route"</A>
                 </nav>
 
-                <Routes fallback=|| view! { <p>"Not found."</p> }>
+                <Transition>
+                    {move || {
+                        let v = auth_signal.get();
+                        view! { <p class="auth-status">{format!("auth_signal = {:?}", v)}</p> }
+                    }}
+                </Transition>
+
+                <Routes fallback=|| view! { <p>"Not found."</p> } transition=true>
                     <Route path=StaticSegment("") view=HomePage/>
                     <ProtectedParentRoute
                         path=StaticSegment("guarded")
@@ -63,7 +70,7 @@ pub fn App() -> impl IntoView {
                         redirect_path=|| "/"
                         fallback=|| ()
                     >
-                        <Route path=StaticSegment("") view=Lazy::<LazyGuardedPage>::new()/>
+                        <Route path=StaticSegment("") view={Lazy::<LazyGuardedPage>::new()}/>
                     </ProtectedParentRoute>
                 </Routes>
             </main>
