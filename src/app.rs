@@ -29,11 +29,13 @@ pub fn App() -> impl IntoView {
 
     let auth = Resource::new(|| (), |_| check_auth());
     let auth_signal: RwSignal<Option<bool>> = RwSignal::new(None);
+
     Effect::new(move |_| {
         if let Some(Ok(value)) = auth.get() {
             auth_signal.set(Some(value));
         }
     });
+
     let auth_condition = move || {
         let value = auth_signal.get();
         #[cfg(feature = "ssr")]
