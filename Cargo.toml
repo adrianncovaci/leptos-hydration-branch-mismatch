@@ -20,6 +20,7 @@ tokio = { version = "1", features = [
 ], optional = true }
 wasm-bindgen = { version = "0.2.122", optional = true }
 web-sys = { version = "0.3", features = ["Window"], optional = true }
+gloo-timers = { version = "0.3", features = ["futures"], optional = true }
 
 [features]
 hydrate = [
@@ -27,6 +28,7 @@ hydrate = [
     "dep:console_error_panic_hook",
     "dep:wasm-bindgen",
     "dep:web-sys",
+    "dep:gloo-timers",
 ]
 ssr = [
     "dep:axum",

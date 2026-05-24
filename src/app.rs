@@ -2,7 +2,7 @@ use leptos::prelude::*;
 use leptos_meta::{provide_meta_context, MetaTags, Stylesheet, Title};
 use leptos_router::{
     components::{Outlet, ProtectedParentRoute, Route, Router, Routes, A},
-    StaticSegment,
+    Lazy, LazyRoute, StaticSegment,
 };
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
@@ -63,7 +63,7 @@ pub fn App() -> impl IntoView {
                         redirect_path=|| "/"
                         fallback=|| ()
                     >
-                        <Route path=StaticSegment("") view=GuardedPage/>
+                        <Route path=StaticSegment("") view=Lazy::<LazyGuardedPage>::new()/>
                     </ProtectedParentRoute>
                 </Routes>
             </main>
@@ -108,6 +108,22 @@ fn GuardedPage() -> impl IntoView {
                 "Hydrated button"
             </button>
         </div>
+    }
+}
+
+pub struct LazyGuardedPage;
+
+impl LazyRoute for LazyGuardedPage {
+    fn data() -> Self {
+        Self
+    }
+
+    fn view(_this: Self) -> impl std::future::Future<Output = AnyView> {
+        async move {
+            #[cfg(feature = "hydrate")]
+            gloo_timers::future::TimeoutFuture::new(0).await;
+            view! { <GuardedPage/> }.into_any()
+        }
     }
 }
 
